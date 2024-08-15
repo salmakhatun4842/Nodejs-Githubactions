@@ -2,9 +2,9 @@ name: CodeQL Analysis
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ main ]
   pull_request:
-    branches: [ develop ]
+    branches: [ main ]
   # workflow_dispatch:
 
 jobs:
@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        language: [${{ fromJson(needs['detect-languages'],outputs.languages) }}]
+        language: ${{ fromJson('["' + needs.detect-languages.outputs.languages.replace(',', '","') + '"]') }}
     
     steps:
     - name: Checkout code
