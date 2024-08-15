@@ -41,14 +41,17 @@ jobs:
         codeql_languages=$(echo "$languages" | tr ',' '\n' | grep -E "$(echo $CODEQL_LANGUAGES | tr ',' '|')" | tr '\n' ',' | sed 's/,$//')
         
         echo "CodeQL-supported languages: $codeql_languages"
-        echo "languages=$codeql_languages" >> $GITHUB_OUTPUT
+        
+        # Format the languages as a JSON array for the matrix
+        json_languages=$(echo "$codeql_languages" | tr ',' '\n' | jq -R . | jq -s .)
+        echo "json_languages=$json_languages" >> $GITHUB_ENV
 
   analyze:
     needs: detect-languages
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        language: ${{ fromJson('["' + needs.detect-languages.outputs.languages.replace(',', '","') + '"]') }}
+        language: ${{ fromJson(env.json_languages) }}
     
     steps:
     - name: Checkout code
